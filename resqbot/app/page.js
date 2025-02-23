@@ -50,7 +50,7 @@ export default function HomePage() {
           {/* CTA Buttons */}
           <div className="mt-12 flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
             <a
-              href="https://t.me/resqbot"
+              href="https://t.me/resQbot_bot"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-xl text-indigo-900 bg-indigo-100 hover:bg-white transition-all duration-200 transform hover:scale-105 hover:shadow-xl"

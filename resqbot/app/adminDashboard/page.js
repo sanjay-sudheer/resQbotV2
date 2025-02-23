@@ -17,13 +17,11 @@ function AdminDashboard() {
 
   useEffect(() => { setHydrated(true); }, []);
 
-  const getPriorityColor = (priority) => ({
-    high: "bg-red-500", medium: "bg-yellow-500", low: "bg-green-500"
-  }[priority.toLowerCase()] || "bg-gray-500");
-
-  const getStatusColor = (status) => ({
-    pending: "bg-orange-500", "in progress": "bg-blue-500", resolved: "bg-green-500"
-  }[status.toLowerCase()] || "bg-gray-500");
+  const clearFilters = () => {
+    setSearchQuery("");
+    setSelectedPriority("All");
+    setSelectedStatus("All");
+  };
 
   const filteredIssues = mockIssues.filter(issue =>
     (selectedPriority === "All" || issue.priority === selectedPriority) &&
@@ -39,14 +37,8 @@ function AdminDashboard() {
     <div className="flex h-screen bg-gray-900">
       {/* Sidebar */}
       {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50"
-          onClick={() => setIsSidebarOpen(false)} // Close sidebar when clicking outside
-        >
-          <aside
-            className="fixed top-0 left-0 h-full w-64 bg-gray-800 p-6 shadow-lg transition-transform transform translate-x-0"
-            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside sidebar
-          >
+        <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setIsSidebarOpen(false)}>
+          <aside className="fixed top-0 left-0 h-full w-64 bg-gray-800 p-6 shadow-lg" onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-xl font-bold text-white flex items-center">
                 <LayoutGrid className="h-6 w-6 text-indigo-400 mr-2" />
@@ -61,11 +53,7 @@ function AdminDashboard() {
             <div className="text-white">
               <h3 className="text-lg font-semibold mb-3">Filters</h3>
               <label className="block mb-2 text-gray-400">Priority</label>
-              <select
-                className="w-full bg-gray-700 text-white p-2 rounded mb-4"
-                value={selectedPriority}
-                onChange={(e) => setSelectedPriority(e.target.value)}
-              >
+              <select className="w-full bg-gray-700 text-white p-2 rounded mb-4" value={selectedPriority} onChange={(e) => setSelectedPriority(e.target.value)}>
                 <option>All</option>
                 <option>High</option>
                 <option>Medium</option>
@@ -73,16 +61,17 @@ function AdminDashboard() {
               </select>
 
               <label className="block mb-2 text-gray-400">Status</label>
-              <select
-                className="w-full bg-gray-700 text-white p-2 rounded"
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-              >
+              <select className="w-full bg-gray-700 text-white p-2 rounded mb-4" value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}>
                 <option>All</option>
                 <option>Pending</option>
                 <option>In Progress</option>
                 <option>Resolved</option>
               </select>
+
+              {/* Clear Filters Button */}
+              <button className="w-full bg-red-600 text-white py-2 rounded hover:bg-red-500 transition" onClick={clearFilters}>
+                Clear All Filters
+              </button>
             </div>
           </aside>
         </div>
@@ -105,15 +94,8 @@ function AdminDashboard() {
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center bg-gray-800 p-2 rounded-md flex-1">
             <Search className="text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search issues..."
-              className="bg-transparent outline-none text-white ml-2 w-full"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+            <input type="text" placeholder="Search issues..." className="bg-transparent outline-none text-white ml-2 w-full" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
           </div>
-
           <button onClick={() => setIsSidebarOpen(true)} className="ml-4 bg-gray-800 p-2 rounded-lg text-white hover:bg-gray-700">
             <Filter className="h-6 w-6" />
           </button>
@@ -129,10 +111,14 @@ function AdminDashboard() {
                   <p className="text-gray-400 text-sm">{issue.location}</p>
                 </div>
                 <div className="flex flex-col items-end space-y-2">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getPriorityColor(issue.priority)}`}>
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${{
+                    high: "bg-red-500", medium: "bg-yellow-500", low: "bg-green-500"
+                  }[issue.priority.toLowerCase()] || "bg-gray-500"}`}>
                     {issue.priority}
                   </span>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(issue.status)}`}>
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${{
+                    pending: "bg-orange-500", "in progress": "bg-blue-500", resolved: "bg-green-500"
+                  }[issue.status.toLowerCase()] || "bg-gray-500"}`}>
                     {issue.status}
                   </span>
                 </div>
