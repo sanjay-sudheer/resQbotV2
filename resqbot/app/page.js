@@ -71,11 +71,11 @@ export default function HomePage() {
       <style jsx>{`
         @keyframes fadeInOut {
           0%, 100% {
-            opacity: 0.2;
+            opacity: 0;
             transform: scale(1);
           }
           50% {
-            opacity: 0.6;
+            opacity: 20;
             transform: scale(1.05);
           }
         }
