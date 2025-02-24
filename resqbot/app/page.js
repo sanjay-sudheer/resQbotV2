@@ -19,7 +19,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 to-purple-900 relative overflow-hidden">
       {/* Animated Grid Background */}
-      <div className="absolute inset-0 grid grid-cols-12 gap-4 opacity-10">
+      <div className="absolute inset-0 grid grid-cols-12 gap-4 opacity-30">
         {gridAnimations.map((style, i) => (
           <div
             key={i}
