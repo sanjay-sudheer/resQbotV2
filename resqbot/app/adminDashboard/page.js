@@ -18,7 +18,7 @@ const IssueCard = ({ issue, onClick }) => {
     Pending: "bg-red-500/10 text-red-500",
     "In Progress": "bg-yellow-500/10 text-yellow-500",
     Resolved: "bg-green-500/10 text-green-500"
-  };
+  }
 
   const priorityColors = {
     High: "bg-red-500/10 text-red-500",
