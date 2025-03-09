@@ -1,20 +1,34 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Shield, User, KeyRound } from 'lucide-react';
+import { Shield, KeyRound } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import axios from 'axios';
 
 function AdminLogin() {
-  const [username, setUsername] = useState('');
+  const [id, setId] = useState('');  // Change from username to id
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (username === 'admin' && password === 'admin') {
-      router.push('/adminDashboard');
-    } else {
-      alert('Invalid credentials');
+    setError("");
+
+    try {
+      const response = await axios.post("http://localhost:5000/api/auth/login", {
+        id,      // Send dept ID instead of username
+        password,
+      });
+
+      // Store token in localStorage
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("dept_name", response.data.dept.dept_name);
+
+      // Redirect to department dashboard
+      router.push("/adminDashboard");
+    } catch (err) {
+      setError(err.response?.data?.message || "Login failed");
     }
   };
 
@@ -26,36 +40,38 @@ function AdminLogin() {
             <Shield className="h-12 w-12 text-indigo-300" />
           </div>
           <h2 className="mt-6 text-3xl font-extrabold">
-            Admin Login
+            Department Login
           </h2>
           <p className="mt-2 text-sm text-indigo-200">
-            Access the resQbot admin dashboard
+            Access the resQbot department dashboard
           </p>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
+            {/* Department ID Field */}
             <div>
-              <label htmlFor="username" className="sr-only">
-                Username
+              <label htmlFor="dept_id" className="sr-only">
+                Department ID
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-indigo-400" />
+                  <Shield className="h-5 w-5 text-indigo-400" />
                 </div>
                 <input
-                  id="username"
-                  name="username"
+                  id="dept_id"
+                  name="dept_id"
                   type="text"
                   required
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={id}
+                  onChange={(e) => setId(e.target.value)}
                   className="appearance-none relative block w-full pl-10 pr-3 py-2 border border-gray-600 bg-gray-800 placeholder-gray-400 text-white rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                  placeholder="Username"
+                  placeholder="Department ID"
                 />
               </div>
             </div>
 
+            {/* Password Field */}
             <div>
               <label htmlFor="password" className="sr-only">
                 Password
@@ -78,6 +94,10 @@ function AdminLogin() {
             </div>
           </div>
 
+          {/* Error Message */}
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+
+          {/* Submit Button */}
           <div>
             <button
               type="submit"
@@ -93,3 +113,4 @@ function AdminLogin() {
 }
 
 export default AdminLogin;
+
