@@ -21,6 +21,10 @@ const EmergencySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  status: {
+    type: String,
+    default: 'Pending',
+  },
   timestamp: {
     type: Date,
     default: Date.now,
