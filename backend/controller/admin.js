@@ -19,3 +19,15 @@ export const getAllEmergencies = async (req, res) => {
         });
     }
 };
+
+export const updateEmergencyStatus = async (id, status) => {
+    try {
+        await connectDB();
+        const emergency = await Emergency.findById(id);
+        emergency.status = status;
+        await emergency.save();
+        console.log('Emergency status updated:', emergency);
+    } catch (error) {
+        console.error('Error updating emergency status:', error);
+    }
+};

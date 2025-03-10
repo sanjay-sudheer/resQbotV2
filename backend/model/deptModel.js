@@ -1,15 +1,11 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
+import mongoose from "mongoose";
 
 const deptSchema = new mongoose.Schema({
   dept_id: { type: String, required: true, unique: true },
   password: { type: String },
-  department_name: { type: String, ref: "Department" },
+  department_name: { type: String},
 });
 
-// Hash password before saving
-
-
 const Dept = mongoose.model("Dept", deptSchema);
-module.exports = Dept;
 
+export default Dept;
