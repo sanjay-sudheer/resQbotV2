@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const Dept = require("../models/deptModel");
+const Dept = require("../model/deptModel");
 const dotenv = require("dotenv");
 const mongoose = require('mongoose');
 
