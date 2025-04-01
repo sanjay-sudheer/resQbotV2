@@ -4,6 +4,8 @@ import stt from './model/stt.cjs';
 import { handleEmergency } from './model/genai.mjs';
 import Emergency from './model/emergency.js';
 import { connectDB } from './model/db.mjs';
+import {assignAmbulance} from './model/genai.mjs';
+import { response } from 'express';
 
 dotenv.config();
 connectDB();
@@ -26,6 +28,8 @@ const messages = {
         voiceReceived: '🎤 Voice message received! Our emergency response team is reviewing your situation.',
         errorReporting: '❌ Error reporting emergency. Please try again or call emergency services directly.',
         noActiveEmergencies: 'ℹ️ You have no active emergency reports at the moment.',
+        responseOnWay: '🚨 The appropriate emergency response team has been notified and assistance is on the way.',
+        ambulanceAssigned: (contact, id) => `🚑 An ambulance has been assigned to your location. Contact: ${contact}, ID: ${id}.`,
         errorFetching: '⚠️ Error fetching your emergency details. Please try again.',
         emergencyStatus: (problem, status) => `📋 Your emergency report "${problem}" is currently: ${getStatusEmoji(status)} ${status.toUpperCase()}`,
         statusUpdate: (problem, status) => `⚠️ Update: Your emergency report "${problem}" is now: ${getStatusEmoji(status)} ${status.toUpperCase()}`,
@@ -61,6 +65,7 @@ Just describe your emergency after sharing your location.`
         errorReporting: '❌ Error al reportar la emergencia. Por favor intenta de nuevo o llama directamente a servicios de emergencia.',
         noActiveEmergencies: 'ℹ️ No tienes informes de emergencia activos en este momento.',
         errorFetching: '⚠️ Error al obtener los detalles de tu emergencia. Por favor intenta de nuevo.',
+        responseOnWay: '🚨 El equipo de respuesta a emergencias apropiado ha sido notificado y la asistencia está en camino.',
         emergencyStatus: (problem, status) => `📋 Tu informe de emergencia "${problem}" está actualmente: ${getStatusEmoji(status)} ${getStatusInSpanish(status)}`,
         statusUpdate: (problem, status) => `⚠️ Actualización: Tu informe de emergencia "${problem}" ahora está: ${getStatusEmoji(status)} ${getStatusInSpanish(status)}`,
         help: `ℹ️ Ayuda del Bot de Emergencia:
@@ -241,6 +246,14 @@ bot.on('voice', async (msg) => {
         const url = `https://api.telegram.org/file/bot${token}/${filePath}`;
         const text = await stt(url);
         const emergencyData = await handleEmergency(text, latitude, longitude);
+        if (emergencyData.ambulance) {
+            const ambulance = await assignAmbulance(emergencyData._id);
+            if (ambulance) {
+                bot.sendMessage(chatId, getMessage(chatId, 'ambulanceAssigned', ambulance.contact, ambulance.id));
+            } else {
+                bot.sendMessage(chatId, '⚠️ Sorry, no ambulances are currently available. We will update you when an ambulance becomes available. Please stay safe and wait for further updates.');
+            }
+        }
 
         if (!emergencyData || !emergencyData._id) {
             bot.sendMessage(chatId, getMessage(chatId, 'errorReporting'));

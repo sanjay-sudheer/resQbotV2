@@ -2,6 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import adminRoutes from './routes/admin.js';
 import authRoutes from './routes/authRoute.js';
+import ambulanceRoutes from './routes/ambulance.js';
 import cors from 'cors';
 import { connectDB } from "./model/db.mjs";
 
@@ -15,6 +16,7 @@ app.use(cors());
 connectDB();
 
 app.use('/admin', adminRoutes);
+app.use('/ambulance', ambulanceRoutes);
 app.use('/api/auth', authRoutes);
 
 

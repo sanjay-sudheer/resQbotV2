@@ -21,6 +21,14 @@ const EmergencySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  ambulance: {
+    type: Boolean,
+    required: true,
+  },
+  ambulanceQueue: {
+    type: Boolean,
+    default: false,
+  },
   status: {
     type: String,
     default: 'Pending',
