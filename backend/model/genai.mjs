@@ -3,6 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { connectDB } from "./db.mjs";
 import Emergency from "./emergency.js";
 import Ambulance from './ambulance.js';
+import mongoose from "mongoose";
 
 dotenv.config();
 connectDB();
@@ -57,31 +58,48 @@ export const handleEmergency = async (transcription, latitude, longitude) => {
 };
 
 export const assignAmbulance = async (emergencyId) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     try {
-        const ambulance = await Ambulance.findOne({ status: "available" });
+        const ambulance = await Ambulance.findOne({ status: "available" }).session(session);
+        const emergency = await Emergency.findById(emergencyId).session(session);
+
         if (!ambulance) {
             console.log("No available ambulances found. Adding to queue...");
             
-            // Add the emergency to a queue for pending ambulance assignment
-            const emergency = await Emergency.findById(emergencyId);
             if (emergency) {
-                emergency.ambulanceQueue = true; // Mark as waiting for ambulance
-                await emergency.save();
+                emergency.ambulanceQueue = true; 
+                await emergency.save({ session });  // Save inside transaction
                 console.log("🚨 Emergency added to ambulance queue:", emergencyId);
             } else {
                 console.error("❌ Emergency not found for queuing:", emergencyId);
             }
-            return null;
+
+            await session.commitTransaction();
+            session.endSession();
+            return null; 
         }
 
+        // Update ambulance status
         ambulance.status = "assigned";
-        ambulance.assignedEmergency = emergencyId; // Assign the emergency ID to the ambulance
-        await ambulance.save();
+        ambulance.assignedEmergency = emergencyId;
+        await ambulance.save({ session });
+
+        // Update emergency
+        emergency.ambulanceQueue = false; 
+        await emergency.save({ session });
+
+        // Commit transaction
+        await session.commitTransaction();
+        session.endSession();
 
         console.log("🚑 Ambulance assigned:", ambulance);
         return ambulance;
     } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
         console.error("❌ Error assigning ambulance:", error);
         throw error;
     }
-}
+};

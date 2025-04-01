@@ -19,7 +19,7 @@ const DriverDashboard = () => {
         setStatus(newStatus);
 
         try {
-            const response = await fetch("/api/updateAmbulanceStatus", {
+            const response = await fetch("http://localhost:5000/ambulance/updateStatus", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -38,11 +38,18 @@ const DriverDashboard = () => {
 
     const fetchEmergency = async () => {
         try {
-            const response = await fetch(`/api/getAssignedEmergency/${ambulanceId}`);
+            const response = await fetch(`http://localhost:5000/ambulance/getAssigned/${ambulanceId}`);
             const data = await response.json();
 
             if (data.success) {
-                setEmergency(data.data);
+                setEmergency({
+                    id: data.data._id,
+                    location: `${data.data.latitude}, ${data.data.longitude}`,
+                    description: data.data.problem,
+                    priority: data.data.priority,
+                    department: data.data.department,
+                    timestamp: new Date(data.data.timestamp).toLocaleString(),
+                });
             } else {
                 setEmergency(null);
             }
@@ -87,9 +94,44 @@ const DriverDashboard = () => {
                 <h2>Incoming Emergency</h2>
                 {emergency ? (
                     <div className="emergency-details">
-                        <p><strong>Emergency ID:</strong> {emergency._id}</p>
                         <p><strong>Location:</strong> {emergency.location}</p>
                         <p><strong>Description:</strong> {emergency.description}</p>
+                        <button
+                            onClick={() =>
+                                window.open(
+                                    `https://www.google.com/maps?q=${emergency.location}`,
+                                    "_blank"
+                                )
+                            }
+                        >
+                            View on Map
+                        </button>
+                        <br />
+                        <button
+                            onClick={async () => {
+                                try {
+                                    const response = await fetch("http://localhost:5000/ambulance/complete", {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                        },
+                                        body: JSON.stringify({ id: ambulanceId }),
+                                    });
+
+                                    const data = await response.json();
+                                    if (data.success) {
+                                        setEmergency(null);
+                                        alert("Emergency completed successfully.");
+                                    } else {
+                                        console.error("Failed to complete emergency:", data.message);
+                                    }
+                                } catch (error) {
+                                    console.error("Error completing emergency:", error);
+                                }
+                            }}
+                        >
+                            Complete Emergency
+                        </button>
                     </div>
                 ) : (
                     <p>No emergencies assigned.</p>
