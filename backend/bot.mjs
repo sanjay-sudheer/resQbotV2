@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import stt from './model/stt.cjs';
 import { handleEmergency } from './model/genai.mjs';
 import Emergency from './model/emergency.js';
+import Ambulance from './model/ambulance.js';
 import { connectDB } from './model/db.mjs';
 import {assignAmbulance} from './model/genai.mjs';
 import { response } from 'express';
@@ -272,7 +273,6 @@ bot.on('voice', async (msg) => {
     }
 });
 
-// Function to check and notify status changes
 const checkForStatusUpdates = async () => {
     try {
         const emergencies = await Emergency.find({ status: { $ne: "resolved" } });
@@ -283,7 +283,7 @@ const checkForStatusUpdates = async () => {
             const oldStatus = previousStatuses.get(emergencyId);
 
             if (oldStatus && oldStatus !== newStatus) {
-                // Status changed, notify user
+                // Status has changed, notify user
                 const chatId = [...userEmergencies.entries()].find(([_, id]) => id.equals(emergency._id))?.[0];
 
                 if (chatId) {
@@ -303,6 +303,43 @@ const checkForStatusUpdates = async () => {
         console.error("❌ Error checking emergency status:", error);
     }
 };
+
+const previousAmbulanceAssignments = new Map();  // Store previous ambulance assignments
+
+const checkForAmbulanceUpdates = async () => {
+    try {
+        const emergencies = await Emergency.find({ status: { $ne: "resolved" } });
+
+        for (const emergency of emergencies) {
+            const emergencyId = emergency._id.toString();
+            
+            // Fetch assigned ambulance for the emergency
+            const ambulance = await Ambulance.findOne({ assignedEmergency: emergency._id });
+
+            if (ambulance) {
+                // Check if the ambulance assignment has changed
+                const previousAmbulance = previousAmbulanceAssignments.get(emergencyId);
+
+                if (!previousAmbulance || previousAmbulance.toString() !== ambulance._id.toString()) {
+                    // Ambulance assignment has changed, send the update
+                    const chatId = [...userEmergencies.entries()].find(([_, id]) => id.equals(emergency._id))?.[0];
+
+                    if (chatId) {
+                        const ambulanceMessage = getMessage(chatId, 'ambulanceAssigned', ambulance.contact, ambulance.id, ambulance.status);
+                        bot.sendMessage(chatId, ambulanceMessage);
+                    }
+
+                    // Update the previous ambulance assignment
+                    previousAmbulanceAssignments.set(emergencyId, ambulance._id);
+                }
+            }
+        }
+    } catch (error) {
+        console.error("❌ Error checking ambulance assignments:", error);
+    }
+};
+
+
 
 // Handle all text messages
 bot.on('message', async (msg) => {
@@ -332,7 +369,11 @@ bot.on('message', async (msg) => {
 
         const emergencyId = userEmergencies.get(chatId);
         const emergency = await Emergency.findById(emergencyId);
-
+        const ambluance = await Ambulance.findOne({ assignedEmergency: emergencyId });
+        if (ambluance) {
+            const ambulanceMessage = getMessage(chatId, 'ambulanceAssigned', ambluance.contact, ambluance.id);
+            bot.sendMessage(chatId, ambulanceMessage);
+        }
         if (!emergency) {
             bot.sendMessage(chatId, getMessage(chatId, 'errorFetching'));
             return;
@@ -351,4 +392,5 @@ bot.onText(/\/help/, (msg) => {
 
 // Run status check in the background
 setInterval(checkForStatusUpdates, 5000);
+setInterval(checkForAmbulanceUpdates, 5000);
 console.log('🚨 Emergency Assistance Bot is running!');
