@@ -83,37 +83,38 @@ const DriverDashboard = () => {
     }
   };
 
-  const fetchEmergency = async () => {
+const fetchEmergency = async () => {
     try {
-      const response = await fetch(`https://resqbotv2.onrender.com/ambulance/getAssigned/${ambulanceId}`);
-      
-      if (!response.ok) {
-        throw new Error(`Server returned ${response.status}: ${response.statusText}`);
-      }
+        const response = await fetch(`https://resqbotv2.onrender.com/ambulance/getAssigned/${ambulanceId}`);
+        
+        if (!response.ok) {
+            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+        }
 
-      const data = await response.json();
-      if (data.success) {
-        setEmergency({
-          id: data.data._id,
-          location: `${data.data.latitude}, ${data.data.longitude}`,
-          description: data.data.problem,
-          priority: data.data.priority,
-          department: data.data.department,
-          timestamp: new Date(data.data.timestamp).toLocaleString(),
-        });
-        setError(null);
-      } else {
-        setEmergency(null);
-      }
+        const data = await response.json();
+        if (data.success && data.data) {
+            setEmergency({
+                id: data.data._id,
+                location: `${data.data.latitude}, ${data.data.longitude}`,
+                description: data.data.problem,
+                priority: data.data.priority,
+                department: data.data.department,
+                timestamp: new Date(data.data.timestamp).toLocaleString(),
+            });
+            setError(null);
+        } else {
+            setEmergency(null);
+            setError(null); // Clear any previous errors if no emergencies are assigned
+        }
     } catch (error) {
-      console.error("Error fetching emergency:", error);
-      if (error instanceof TypeError && error.message === "Failed to fetch") {
-        setError("Unable to connect to dispatch server. Please ensure the server is running at https://resqbotv2.onrender.com");
-      } else {
-        setError(`Unable to fetch emergencies: ${error.message}. Updates will resume when connection is restored.`);
-      }
+        console.error("Error fetching emergency:", error);
+        if (error instanceof TypeError && error.message === "Failed to fetch") {
+            setError("Unable to connect to dispatch server. Please ensure the server is running at https://resqbotv2.onrender.com");
+        } else {
+            setError(`Unable to fetch emergencies: ${error.message}. Updates will resume when connection is restored.`);
+        }
     }
-  };
+};
 
   useEffect(() => {
     if (isAuthenticated && status === "available") {
