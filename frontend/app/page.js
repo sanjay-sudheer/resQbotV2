@@ -48,20 +48,30 @@ export default function HomePage() {
           </p>
 
           {/* CTA Buttons */}
-          <div className="mt-12 flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-            <a
-              href="https://t.me/resQbot_bot"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-xl text-indigo-900 bg-indigo-100 hover:bg-white transition-all duration-200 transform hover:scale-105 hover:shadow-xl"
-            >
-              Open in Telegram
-            </a>
+          <div className="mt-12 flex flex-col items-center justify-center space-y-6">
+            {/* First row with two buttons */}
+            <div className="flex flex-col sm:flex-row w-full justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+              <a
+                href="https://t.me/resQbot_bot"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-medium rounded-xl text-indigo-900 bg-indigo-100 hover:bg-white transition-all duration-200 transform hover:scale-105 hover:shadow-xl"
+              >
+                Open in Telegram
+              </a>
+              <Link
+                href="/adminLogin"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 border border-indigo-200 text-lg font-medium rounded-xl text-indigo-600 bg-indigo-200 hover:bg-gray-100 transition-all duration-200 transform hover:scale-105 hover:shadow-xl"
+              >
+                Admin Dashboard
+              </Link>
+            </div>
+            {/* Second row with ambulance button */}
             <Link
-              href="/adminLogin"
-              className="inline-flex items-center px-8 py-4 border border-indigo-300 text-lg font-medium rounded-xl text-indigo-100 hover:bg-indigo-800/30 transition-all duration-200 transform hover:scale-105 hover:shadow-xl"
+              href="/driverDashboard"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 border border-pink-300 text-lg font-medium rounded-xl text-pink-100 hover:bg-pink-800/30 transition-all duration-200 transform hover:scale-105 hover:shadow-xl"
             >
-              Admin Dashboard
+              Ambulance Portal
             </Link>
           </div>
         </div>
