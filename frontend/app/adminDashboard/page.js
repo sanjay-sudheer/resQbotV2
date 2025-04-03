@@ -240,7 +240,7 @@ function AdminDashboard() {
     // Fetch data from API when component mounts
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/admin/getAll');
+        const response = await fetch('https://resqbotv2.onrender.com/admin/getAll');
         
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
@@ -302,7 +302,7 @@ function AdminDashboard() {
       );
       
       // Call the API to update status
-      const response = await fetch('http://localhost:5000/admin/updateStatus', {
+      const response = await fetch('https://resqbotv2.onrender.com/admin/updateStatus', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

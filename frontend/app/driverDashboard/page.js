@@ -20,7 +20,7 @@ const DriverDashboard = () => {
     try {
         console.log("🔹 Sending request to /amblogin with ID:", ambulanceId);
 
-        const response = await axios.post("http://localhost:5000/api/auth/amblogin", {
+        const response = await axios.post("https://resqbotv2.onrender.com/api/auth/amblogin", {
             id: Number(ambulanceId), // Ensure ID is sent as a Number
         });
 
@@ -57,7 +57,7 @@ const DriverDashboard = () => {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:5000/ambulance/updateStatus", {
+      const response = await fetch("https://resqbotv2.onrender.com/ambulance/updateStatus", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -76,7 +76,7 @@ const DriverDashboard = () => {
     } catch (error) {
       console.error("Error updating status:", error);
       if (error instanceof TypeError && error.message === "Failed to fetch") {
-        setError("Unable to connect to dispatch server. Please ensure the server is running at http://localhost:5000");
+        setError("Unable to connect to dispatch server. Please ensure the server is running at https://resqbotv2.onrender.com");
       } else {
         setError(`Unable to update status: ${error.message}. Status updates will resume when connection is restored.`);
       }
@@ -85,7 +85,7 @@ const DriverDashboard = () => {
 
   const fetchEmergency = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/ambulance/getAssigned/${ambulanceId}`);
+      const response = await fetch(`https://resqbotv2.onrender.com/ambulance/getAssigned/${ambulanceId}`);
       
       if (!response.ok) {
         throw new Error(`Server returned ${response.status}: ${response.statusText}`);
@@ -108,7 +108,7 @@ const DriverDashboard = () => {
     } catch (error) {
       console.error("Error fetching emergency:", error);
       if (error instanceof TypeError && error.message === "Failed to fetch") {
-        setError("Unable to connect to dispatch server. Please ensure the server is running at http://localhost:5000");
+        setError("Unable to connect to dispatch server. Please ensure the server is running at https://resqbotv2.onrender.com");
       } else {
         setError(`Unable to fetch emergencies: ${error.message}. Updates will resume when connection is restored.`);
       }
@@ -245,7 +245,7 @@ const DriverDashboard = () => {
                 <button
                   onClick={async () => {
                     try {
-                      const response = await fetch("http://localhost:5000/ambulance/complete", {
+                      const response = await fetch("https://resqbotv2.onrender.com/ambulance/complete", {
                         method: "POST",
                         headers: {
                           "Content-Type": "application/json",
@@ -268,7 +268,7 @@ const DriverDashboard = () => {
                     } catch (error) {
                       console.error("Error completing emergency:", error);
                       if (error instanceof TypeError && error.message === "Failed to fetch") {
-                        setError("Unable to connect to dispatch server. Please ensure the server is running at http://localhost:5000");
+                        setError("Unable to connect to dispatch server. Please ensure the server is running at https://resqbotv2.onrender.com");
                       } else {
                         setError(`Unable to complete emergency: ${error.message}. Please try again when connection is restored.`);
                       }
