@@ -110,8 +110,6 @@ const fetchEmergency = async () => {
         console.error("Error fetching emergency:", error);
         if (error instanceof TypeError && error.message === "Failed to fetch") {
             setError("Unable to connect to dispatch server. Please ensure the server is running at https://resqbotv2.onrender.com");
-        } else {
-            setError(`Unable to fetch emergencies: ${error.message}. Updates will resume when connection is restored.`);
         }
     }
 };
